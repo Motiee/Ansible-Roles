@@ -1,0 +1,6 @@
+ - name: Disable swap
+   replace:
+    path: /etc/fstab
+    regexp: '\/swap.img'
+    replace: '#/swap.img'
+    backup: yes

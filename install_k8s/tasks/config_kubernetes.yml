@@ -1,0 +1,43 @@
+ - name:  config k8s 1/9 ( kubeadm init )
+   shell: kubeadm init --apiserver-advertise-address {{controlPlane_IP}} --pod-network-cidr {{flannel_CIDR}}
+   when: ansible_hostname == '{{controlPlane_hostname}}'
+   register: token
+          
+ - name: config k8s 2/9 ( copy kubeadm init's Result in {{controlPlane_hostname}} path:{{kubeadm_init_result_path}} )
+   when: ansible_hostname == '{{controlPlane_hostname}}'
+   local_action: copy content="{{token.stdout_lines}}" dest="{{kubeadm_init_result_path}}"
+    
+ - name: config k8s 3/9 ( set KUBECONFIG )
+   shell: export KUBECONFIG={{k8s_adminconf_path}};echo 'export KUBECONFIG={{k8s_adminconf_path}}' >> /root/.bashrc
+   when: ansible_hostname == '{{controlPlane_hostname}}'
+
+ - name: config k8s 4/9 ( red token from control plane )
+   shell: awk 'match($0, /kubeadm join.*[a-zA-Z0-9/]+/) {print substr($0, RSTART, RLENGTH)}' {{kubeadm_init_result_path}} |sed 's|[",,\]||g' | sed 's|t--|--|g' | tee {{kubeadm_token_path}}
+   when: ansible_hostname == '{{controlPlane_hostname}}'
+   register: join_command
+
+ - name: config k8s 5/9 ( print token )
+   when: ansible_hostname == '{{controlPlane_hostname}}'
+   debug:
+    msg: "{{join_command.stdout}}"
+
+ - name: config k8s 6/9 ( Copy join command from control plane to the worker nodes )
+   when: ansible_hostname != '{{controlPlane_hostname}}'
+   copy:
+    src: '{{kubeadm_token_path}}'
+    dest: '{{kubeadm_token_path}}'
+    mode: 0777
+      
+ - name: config k8s 7/9 ( join the Worker nodes to the cluster )
+   when: ansible_hostname != '{{controlPlane_hostname}}'
+   command: sh '{{kubeadm_token_path}}'
+   register: join_result
+
+ - name: config k8s 8/9 ( show Worker nodes's join result )
+   when: ansible_hostname != '{{controlPlane_hostname}}'
+   debug:
+     msg: "join result :{{join_result.stdout_lines}}"
+
+ - name: config k8s 9/9 ( let regular user access to kubectl )
+   shell: mkdir -p $HOME/.kube;cp /etc/kubernetes/admin.conf $HOME/.kube/config;chown $(id -u):$(id -g) $HOME/.kube/config
+   when: ansible_hostname == '{{controlPlane_hostname}}'

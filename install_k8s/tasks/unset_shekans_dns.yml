@@ -1,0 +1,15 @@
+ - name: unset shekan dns 1/2 (first dns addresse)
+   lineinfile:
+     path: '{{dnsconf_path}}'
+     line: "nameserver {{shekan_dns1}}"
+     backup: true
+     create: true
+     state: absent  
+
+ - name: unset shekan dns 2/2(second dns addresse)
+   lineinfile:
+     path: '{{dnsconf_path}}'
+     line: "nameserver {{shekan_dns2}}"
+     backup: true
+     create: true
+     state: absent

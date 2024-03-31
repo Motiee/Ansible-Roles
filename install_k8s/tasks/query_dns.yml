@@ -1,0 +1,7 @@
+  - name: Query DNS Task 1/2 ( Query )
+    shell: cat {{dnsconf_path}} | grep -E '^nameserver.*$'
+    register: myresult
+  
+  - name: Query DNS Task 2/2 ( Print )
+    debug:
+       msg: "{{ansible_hostname}}'s dns servers:{{myresult.stdout_lines}}"

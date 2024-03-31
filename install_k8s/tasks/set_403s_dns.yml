@@ -1,0 +1,14 @@
+  - name: set 403 dns 1/2 ( first dns addresse )
+    lineinfile:
+      path: '{{dnsconf_path}}'
+      line: "nameserver {{_403_dns1}}"
+      backup: true
+      create: true
+      
+  - name: set 403 dns 2/2( second dns addresse )
+    lineinfile:
+      path: '{{dnsconf_path}}'
+      line: "nameserver {{_403_dns2}}"
+      backup: true
+      create: true
+

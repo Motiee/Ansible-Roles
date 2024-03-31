@@ -1,0 +1,10 @@
+ - name: Install prerequisites 1/2 (apt-transport-https,ca-certificates,curl,conntrack,gnupg) 
+   apt: 
+    name: ['apt-transport-https','ca-certificates','curl','conntrack','gnupg']
+    state: latest
+    update_cache: yes
+    autoremove: yes
+
+ - name: Install prerequisites 2/2 (set /etc/apt/keyrings 2/2)
+   shell: install -m 0755 -d /etc/apt/keyrings
+

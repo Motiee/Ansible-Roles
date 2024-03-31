@@ -1,0 +1,3 @@
+ - name:  install flannel
+   shell: kubectl apply -f {{flannel_yaml_path}};
+   when: ansible_hostname == '{{controlPlane_hostname}}'

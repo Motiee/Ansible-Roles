@@ -1,0 +1,9 @@
+  - hosts: all
+    become: yes
+    roles:
+      - install_k8s
+
+
+
+
+

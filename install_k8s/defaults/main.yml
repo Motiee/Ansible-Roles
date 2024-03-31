@@ -1,0 +1,35 @@
+---
+# defaults file for install_k8s
+controlPlane_IP: "192.168.10.21"
+controlPlane_hostname: "devops-vm1"
+
+flannel_CIDR: "10.244.0.0/16"
+
+##############dns###################
+                                  ##
+dnsconf_path : "/etc/resolv.conf" ##
+                                  ##
+shekan_dns1: "178.22.122.100"     ##
+shekan_dns2: "185.51.200.2"       ##
+                                  ##
+_403_dns1: "10.202.10.202"        ##
+_403_dns2: "10.202.10.102"        ##
+                                  ##
+####################################
+
+token_regex : '/kubeadm join.*[a-zA-Z0-9/]+/'
+
+kubeadm_init_result_path: "/tmp/kubeadm_init_result.txt"
+
+kubeadm_token_path: "/tmp/kubeadm_token.txt"
+
+
+k8s_adminconf_path: "/etc/kubernetes/admin.conf"
+containerdconfig_path: "/etc/containerd"
+containerd_filename: "config.toml"
+
+flannel_yaml_path: "https://github.com/coreos/flannel/raw/master/Documentation/kube-flannel.yml"
+
+ 
+
+

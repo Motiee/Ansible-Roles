@@ -1,0 +1,39 @@
+ - name: install docker 1/7 ( set docker.gpg )
+   shell: curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor --yes -o /etc/apt/keyrings/docker.gpg ;  chmod a+r /etc/apt/keyrings/docker.gpg
+   register: myresult
+     
+ - name: Install docker 2/7 (docker-ce,docker-ce-cli,containerd.io,docker-buildx-plugin,docker-compose-plugin)
+   apt: 
+    name: [docker-ce,docker-ce-cli,containerd.io,docker-buildx-plugin,docker-compose-plugin]
+    state: latest
+    update_cache: yes
+    autoremove: yes
+
+ - name: Install docker 3/7 ( add docker repository )
+   apt_repository:
+    repo: deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu jammy stable
+    state: present
+    filename: /etc/apt/sources.list.d/docker
+    mode: ugo+rw
+    update_cache: yes
+
+ - name: Install docker 4/7 ( query containerd version )
+   shell: containerd --version
+   register: myresult
+
+ - name: Install docker 5/7 ( print containerd version )
+   debug:
+    msg: "{{ansible_hostname}}'s containerd version:{{myresult.stdout_lines}}"
+
+ - name: Install docker 6/7 Create a containerd configuration file
+   shell: mkdir -p {{containerdconfig_path}};containerd config default|tee {{containerdconfig_path}}/{{containerd_filename}}
+   register: myresult
+
+ - name: Install docker 6/7 set SystemdCgroup in containerd
+   replace:
+    path: /etc/containerd/config.toml
+    regexp: 'SystemdCgroup = false'
+    replace: 'SystemdCgroup = true'
+    backup: yes
+   notify:
+      - Restart containerd

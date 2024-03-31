@@ -1,0 +1,19 @@
+---
+# tasks file for install_k8s
+
+- import_tasks: unset_shekans_dns.yml
+- import_tasks: set_403s_dns.yml
+- import_tasks: query_dns.yml
+
+- import_tasks: disable_swap.yml
+- import_tasks: install_prerequisites.yml
+- import_tasks: install_docker.yml
+- import_tasks: install_kubernetes.yml
+- import_tasks: config_kubernetes.yml
+
+- import_tasks: install_flannel.yml
+- import_tasks: query_nodes.yml
+
+- import_tasks: unset_403_dns.yml
+- import_tasks: query_dns.yml
+

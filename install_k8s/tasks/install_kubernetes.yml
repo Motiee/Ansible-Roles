@@ -1,0 +1,40 @@
+ - name: install k8s 1/7 ( add br_netfilter and overlay modules to Linux kernel )
+   shell: modprobe br_netfilter overlay     
+     
+ - name: install k8s 2/7 ( configure required sysctl to persist across system reboots)
+   template: 
+    src: ./templates/k8s.j2
+    dest: /etc/sysctl.d/k8s.conf
+    force: yes
+    mode: '0644'
+
+ - name: install k8s 3/7 ( get kubernetes-apt-keyring.gpg )
+   shell: curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.29/deb/Release.key|gpg --dearmor --yes -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+
+
+ - name: install k8s 4/7 ( add kubernetes repository )
+   apt_repository:
+    repo: deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.29/deb/ /
+    state: present
+    filename: /etc/apt/sources.list.d/kubernetes
+    mode: ugo+rw
+    update_cache: yes
+    
+ - name: install k8s 5/7 ( install kubectl, kubeadm & kubelet )
+   apt: 
+    name: [kubectl, kubeadm, kubelet]
+    state: latest
+    update_cache: yes
+    autoremove: yes
+
+ - name: install k8s 6/7 ( hold kubectl, kubeadm & kubelet )
+   dpkg_selections:
+    name: "{{ item }}"
+    selection: hold
+   loop:
+    - kubectl
+    - kubeadm
+    - kubelet
+
+ - name:  install k8s 7/7 ( add completion to bash )
+   shell: kubectl completion bash > /etc/bash_completion.d/kubectl;kubeadm completion bash > /etc/bash_completion.d/kubeadm 

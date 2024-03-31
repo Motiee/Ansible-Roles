@@ -1,0 +1,10 @@
+
+ - name:  query nodes 1/2 (get nodes )
+   shell: kubectl get nodes
+   when: ansible_hostname == '{{controlPlane_hostname}}'
+   register: nodes
+
+ - name: query nodes 1/2 ( print nodes )
+   when: ansible_hostname == '{{controlPlane_hostname}}'
+   debug:
+    msg: " {{nodes.stdout_lines}} "
